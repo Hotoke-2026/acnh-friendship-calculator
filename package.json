@@ -17,7 +17,7 @@
     "build": "run-s build:client build:server",
     "build:client": "vite build",
     "build:server": "esbuild --packages=external --platform=node --format=esm --outfile=dist/server.js --bundle server/index.ts",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
+    "lint": "eslint client server --ext .js,.jsx,.ts,.tsx",
     "knex": "knex --knexfile ./server/db/knexfile.js"
   },
   "eslintConfig": {
@@ -27,8 +27,13 @@
     ]
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.24.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "dotenv": "^17.4.2",
     "express": "^4.22.1",
+    "express-oauth2-jwt-bearer": "^1.10.0",
     "knex": "^2.5.1",
+    "react-router-dom": "^7.18.3",
     "sqlite3": "^5.1.7",
     "superagent": "^10.2.2"
   },
@@ -58,12 +63,12 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^7.13.0",
-    "sass": "^1.50.1",
+    "sass": "^1.104.0",
     "supertest": "^7.2.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.3.3",
+    "typescript": "^5.5.4",
     "vite": "^7.3.1",
-    "vitest": "^3.0.5"
+    "vitest": "^3.2.7"
   },
   "overrides": {
     "sqlite3": {
