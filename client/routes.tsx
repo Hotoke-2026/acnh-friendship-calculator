@@ -1,7 +1,19 @@
-/* eslint-disable react/jsx-key */
-import { createRoutesFromElements, Route } from 'react-router'
+import { createBrowserRouter } from 'react-router-dom'
 import App from './components/App'
+import { DashboardPage } from './pages/DashboardPage'
+import { VillagerListPage } from './pages/VillagerListPage'
+import { VillagerInteractPage } from './pages/VillagerInteractPage'
+import { Wardrobe } from './components/Wardrobe'
 
-const routes = createRoutesFromElements(<Route index element={<App />} />)
-
-export default routes
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <App />,
+    children: [
+      { index: true, element: <DashboardPage /> },
+      { path: 'villagers', element: <VillagerListPage /> },
+      { path: 'villagers/:id', element: <VillagerInteractPage /> },
+      { path: 'wardrobe', element: <Wardrobe /> },
+    ],
+  },
+])

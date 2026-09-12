@@ -1,19 +1,30 @@
-import express from 'express'
-import * as Path from 'node:path'
+import dotenv from 'dotenv'
+dotenv.config()
 
-import fruitRoutes from './routes/fruits.ts'
+import express from 'express'
+import path from 'node:path'
+import { auth } from 'express-oauth2-jwt-bearer'
+import villagersRouter from './routes/villagers'
+import nookipediaRouter from './routes/nookipedia'
 
 const server = express()
 
 server.use(express.json())
 
-server.use('/api/v1/fruits', fruitRoutes)
+const checkJwt = auth({
+  audience: 'https://api.animalfriendship.com',
+  issuerBaseURL: `https://${process.env.VITE_AUTH0_DOMAIN || 'hotoke2026-levi.au.auth0.com'}/`,
+  tokenSigningAlg: 'RS256',
+})
+
+server.use('/api/v1/villagers', checkJwt, villagersRouter)
+server.use('/api/v1/nookipedia', nookipediaRouter)
 
 if (process.env.NODE_ENV === 'production') {
-  server.use(express.static(Path.resolve('public')))
-  server.use('/assets', express.static(Path.resolve('./dist/assets')))
-  server.get('*', (req, res) => {
-    res.sendFile(Path.resolve('./dist/index.html'))
+  const clientPath = path.resolve('dist')
+  server.use(express.static(clientPath))
+  server.get('*', (_req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'))
   })
 }
 

@@ -4,3 +4,229 @@ html,
 body {
   font-family: 'Montserrat', sans-serif;
 }
+
+// Variables & Design Tokens
+$bg-cream: #FAF7F2;
+$bg-white: #FFFFFF;
+$bg-neutral-light: #F5F2EC;
+$bg-pink-light: #F3E8EE;
+$bg-blue-light: #E4F0F2;
+$bg-green-dark: #2D4B43;
+$bg-green-badge: #EAF3EC;
+$accent-orange: #E87A5D;
+
+$text-dark: #2D2B2A;
+$text-subtle: #7A756C;
+$text-muted: #8A857B;
+
+.app-container {
+  max-width: 420px;
+  margin: 0 auto;
+  background-color: $bg-cream;
+  min-height: 100vh;
+  padding: 1.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  border-radius: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+
+  // Add inside .app-container
+.action-card-button {
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+  .app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .island-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: $text-muted;
+    }
+
+    h1 {
+      margin: 0.2rem 0 0 0;
+      font-size: 1.5rem;
+      color: $text-dark;
+    }
+
+    .date-string {
+      margin: 0.2rem 0 0 0;
+      font-size: 0.85rem;
+      color: $text-subtle;
+    }
+
+    .logout-btn {
+      background: #EAE5DC;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+  }
+
+  .summary-card {
+    background-color: $bg-white;
+    border-radius: 20px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: $text-dark;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: $text-muted;
+      }
+
+      .level-badge {
+        background-color: $accent-orange;
+        color: #FFF;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.25rem 0.6rem;
+        border-radius: 12px;
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      text-align: center;
+
+      .stat-box {
+        padding: 0.75rem;
+        border-radius: 14px;
+
+        &.neutral { background-color: $bg-neutral-light; }
+        &.pink { background-color: $bg-pink-light; }
+        &.blue { background-color: $bg-blue-light; }
+
+        .stat-icon { font-size: 1.2rem; }
+        strong { font-size: 1.1rem; color: $text-dark; }
+        .stat-label { font-size: 0.75rem; color: $text-muted; }
+      }
+    }
+  }
+
+  .villagers-section {
+    margin-bottom: 1.5rem;
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+
+      h3 { margin: 0; font-size: 1.1rem; color: $text-dark; }
+      .see-all { font-size: 0.85rem; color: $text-subtle; font-weight: 600; }
+    }
+
+    .villager-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .villager-card {
+        background-color: $bg-white;
+        border-radius: 16px;
+        padding: 0.85rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+
+        .villager-info {
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+
+          .villager-icon {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 50%;
+            background-color: $bg-neutral-light;
+            padding: 2px;
+          }
+
+          h4 { margin: 0; font-size: 1rem; color: $text-dark; }
+          .species { font-size: 0.75rem; color: $text-muted; }
+          .friendship-status { font-size: 0.7rem; color: $accent-orange; margin-top: 2px; }
+        }
+
+        .gift-link {
+          background-color: $bg-green-badge;
+          padding: 0.5rem;
+          border-radius: 10px;
+          text-decoration: none;
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+
+  .closet-banner {
+    background-color: $bg-green-dark;
+    border-radius: 20px;
+    padding: 1.25rem;
+    color: #FFFFFF;
+
+    .banner-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      .subtitle { font-size: 0.8rem; opacity: 0.8; }
+      h3 { margin: 0.2rem 0 0 0; font-size: 1.5rem; }
+      .meta { font-size: 0.75rem; opacity: 0.7; }
+
+      .closet-link {
+        color: #FFFFFF;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+    }
+
+    .closet-categories {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+
+      .category-pill {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        padding: 0.6rem;
+        text-align: center;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
