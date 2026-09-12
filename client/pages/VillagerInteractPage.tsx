@@ -68,26 +68,22 @@ export function VillagerInteractPage() {
   const { getAccessTokenSilently } = useAuth0()
 
   const { data, isLoading, isError } = useQuery({
-  queryKey: ['villagerGiftOptions', id],
-  queryFn: async () => {
-    // Force Auth0 to return a valid JWT for your backend API
-    const token = await getAccessTokenSilently({
-      authorizationParams: {
-        audience: 'https://api.animalfriendship.com',
-      },
-    })
+    queryKey: ['villagerGiftOptions', id],
+    queryFn: async () => {
+      // Clean token retrieval using the audience already set in Auth0Provider
+      const token = await getAccessTokenSilently()
 
-    const res = await fetch(`/api/v1/villagers/${id}/gift-options`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+      const res = await fetch(`/api/v1/villagers/${id}/gift-options`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
-    if (!res.ok) throw new Error('Failed to load villager options')
-    return res.json()
-  },
-  enabled: Boolean(id),
-})
+      if (!res.ok) throw new Error('Failed to load villager options')
+      return res.json()
+    },
+    enabled: Boolean(id),
+  })
 
   if (isLoading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading villager details...</div>

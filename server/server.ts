@@ -13,7 +13,7 @@ server.use(express.json())
 
 const checkJwt = auth({
   audience: 'https://api.animalfriendship.com',
-  issuerBaseURL: `https://${process.env.VITE_AUTH0_DOMAIN || 'hotoke2026-levi.au.auth0.com'}/`,
+  issuerBaseURL: 'https://hotoke2026-levi.au.auth0.com/',
   tokenSigningAlg: 'RS256',
 })
 

@@ -6,7 +6,7 @@ const router = express.Router()
 
 const checkJwt = auth({
   audience: process.env.AUTH0_AUDIENCE || 'https://api.animalfriendship.com',
-  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-lry3zg2sng8bwawa.au.auth0.com/',
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://hotoke2026-levi.au.auth0.com/',
   tokenSigningAlg: 'RS256',
 })
 
