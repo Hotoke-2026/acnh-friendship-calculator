@@ -21,7 +21,7 @@ export async function fetchAllClothing(): Promise<NookipediaClothingItem[]> {
 
   const response = await fetch('https://api.nookipedia.com/nh/clothing', {
     headers: {
-      'X-API-KEY': NOOKIPEDIA_API_KEY,
+      'X-API-KEY': process.env.NOOKIPEDIA_API_KEY as string,
       'Accept-Version': '1.0.0',
     },
   });

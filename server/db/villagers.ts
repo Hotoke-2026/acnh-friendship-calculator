@@ -4,7 +4,13 @@ interface VillagerRow {
   id: number
   user_id: string
   name: string
+  species: any
   friendship_points: number
+  imageUrl?: string
+  color1?: any
+  color2?: any
+  style1?: string
+  style2?: string
   is_last_moved_in?: number | boolean
   is_last_asked_to_stay?: number | boolean
   is_house_relocating?: number | boolean
@@ -26,7 +32,11 @@ function toVillager(row: VillagerRow) {
     id: row.id,
     userId: row.user_id,
     name: row.name,
+    species: row.species,
     friendshipPoints: row.friendship_points,
+    imageUrl: row.imageUrl,
+    styles: [row.style1, row.style2].filter(Boolean),
+    colors: [row.color1, row.color2].filter(Boolean),
     isLastMovedIn: Boolean(row.is_last_moved_in),
     isLastAskedToStay: Boolean(row.is_last_asked_to_stay),
     isHouseRelocating: Boolean(row.is_house_relocating),
@@ -34,7 +44,7 @@ function toVillager(row: VillagerRow) {
 }
 
 export async function getVillagersByUserId(userId: string) {
-  const villagers = await db('villagers').where('user_id', userId)
+  const villagers = await db('villagers').select('*').where('user_id', userId)
   return villagers.map(toVillager)
 }
 
@@ -106,7 +116,10 @@ export async function updateVillagerPoints(
 }
 
 export async function getRankedGiftOptionsForVillager(villagerId: number, userId: string) {
-  const villager = await db('villagers').where({ id: villagerId, user_id: userId }).first()
+  const villager = await db('villagers')
+  .select('*')
+  .where({ id: villagerId, user_id: userId })
+  .first()
 
   if (!villager) return null
 

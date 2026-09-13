@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useVillagers } from '../hooks/useVillagers'
@@ -7,7 +8,22 @@ import { SavedVillager } from '../components/models/villager'
 export function DashboardPage() {
   const navigate = useNavigate()
   const { logout, loginWithRedirect, user, isAuthenticated, isLoading: authLoading } = useAuth0()
-  const { data: villagers = [] } = useVillagers()
+  const { data: villagers = [], refetch } = useVillagers()
+  const [, setTick] = useState(0)
+
+  // Re-fetch or force re-render whenever the window regains focus (coming back from interaction page)
+  useEffect(() => {
+    const handleFocus = () => {
+      if (typeof refetch === 'function') {
+        refetch()
+      } else {
+        setTick((t) => t + 1) // forces a re-render if using localStorage underneath
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [refetch])
 
   if (authLoading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Initializing Auth0...</div>

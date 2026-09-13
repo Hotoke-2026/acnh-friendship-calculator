@@ -12,6 +12,7 @@ export interface Villager {
 }
 
 export interface SavedVillager {
+  imageUrl?: string
   id: string
   name: string
   species: string

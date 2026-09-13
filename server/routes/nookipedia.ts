@@ -13,7 +13,7 @@ router.get('/clothing/:name', async (req, res) => {
       `https://api.nookipedia.com/nh/clothing/${encodeURIComponent(req.params.name)}`,
       {
         headers: {
-          'X-API-KEY': apiKey,
+          'X-API-KEY': process.env.NOOKIPEDIA_API_KEY as string,
           'Accept-Version': '1.0.0',
         },
       }
@@ -24,8 +24,6 @@ router.get('/clothing/:name', async (req, res) => {
     }
 
     const data = await response.json()
-    
-    // Extract primary icon URL from the first variation
     const imageUrl = data.variations?.[0]?.image_url || data.image_url || ''
 
     return res.json({
@@ -37,6 +35,48 @@ router.get('/clothing/:name', async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: 'Error fetching clothing item' })
   }
+})
+
+router.get('/villagers', async (req, res) => {
+  const nameQuery = (req.query.name as string || '').toLowerCase()
+
+  // Temporary mock placeholder data until you get your API key tomorrow
+  const mockVillagers = [
+    {
+      name: 'Muffy',
+      species: 'Sheep',
+      nh_details: {
+        icon_url: 'https://dodo.ac/np/images/7/73/Muffy_NH_Villager_Icon.png',
+      },
+    },
+    {
+      name: 'Bruce',
+      species: 'Deer',
+      nh_details: {
+        icon_url: 'https://dodo.ac/np/images/9/9b/Bruce_NH_Villager_Icon.png',
+      },
+    },
+    {
+      name: 'Teddy',
+      species: 'Bear',
+      nh_details: {
+        icon_url: 'https://dodo.ac/np/images/b/bd/Teddy_NH_Villager_Icon.png',
+      },
+    },
+    {
+      name: 'Coco',
+      species: 'Rabbit',
+      nh_details: {
+        icon_url: 'https://dodo.ac/np/images/a/a2/Coco_NH_Villager_Icon.png',
+      },
+    },
+  ]
+
+  const filtered = mockVillagers.filter((v) =>
+    v.name.toLowerCase().includes(nameQuery)
+  )
+
+  return res.json(filtered)
 })
 
 export default router
