@@ -18,7 +18,7 @@ const checkJwt = auth({
 })
 
 server.use('/api/v1/villagers', checkJwt, villagersRouter)
-server.use('/api/v1/nookipedia', nookipediaRouter)
+server.use('/api/v1/nookipedia', checkJwt, nookipediaRouter)
 
 if (process.env.NODE_ENV === 'production') {
   const clientPath = path.resolve('dist')
