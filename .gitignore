@@ -18,6 +18,3 @@ coverage/*
 
 # Build directory
 /dist
-
-# Promptkit repository
-promptkitpromptkit

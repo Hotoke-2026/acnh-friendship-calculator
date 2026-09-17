@@ -37,8 +37,13 @@ router.get('/search', checkJwt, async (req, res) => {
       .set('Accept-Version', '1.0.0')
 
     res.json(response.body)
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error searching Nookipedia API:', err)
+
+    if (err.code === 'EAI_AGAIN' || err.syscall === 'getaddrinfo') {
+      return res.status(503).json({ message: 'Network error: Unable to reach Nookipedia API' })
+    }
+
     res.status(500).json({ message: 'Error searching for villagers' })
   }
 })

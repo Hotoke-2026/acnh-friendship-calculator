@@ -33,6 +33,10 @@ router.get('/clothing/:name', async (req, res) => {
       variations: data.variations || [],
     })
   } catch (error) {
+    if (error instanceof Error && error.cause && (error.cause as any).code === 'EAI_AGAIN') {
+      return res.status(503).json({ message: `Network error: unable to reach Nookipedia API` })
+    }
+    
     return res.status(500).json({ message: 'Error fetching clothing item' })
   }
 })
