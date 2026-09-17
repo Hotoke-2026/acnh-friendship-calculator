@@ -37,7 +37,7 @@ export function DashboardPage() {
     )
   }
 
-  const featuredVillagers = villagers.slice(0, 3)
+  const featuredVillagers = villagers
 
   return (
     <div className="app-container">

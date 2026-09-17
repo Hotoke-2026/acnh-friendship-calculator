@@ -26,7 +26,7 @@ const WRAPPING_PAPERS: WrappingPaper[] = [
   { name: 'Chartreuse Wrapping Paper', color: 'Chartreuse', imageUrl: 'https://dodo.ac/np/images/thumb/7/7b/Chartreuse_Wrapping_Paper_NH_Icon.png/60px-Chartreuse_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/7/7b/Chartreuse_Wrapping_Paper_NH_Icon.png/60px-Chartreuse_Wrapping_Paper_NH_Icon.png' },
   { name: 'Gold Wrapping Paper', color: 'Gold', imageUrl: 'https://dodo.ac/np/images/thumb/e/e4/Gold_Wrapping_Paper_NH_Icon.png/60px-Gold_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/e/e4/Gold_Wrapping_Paper_NH_Icon.png/60px-Gold_Wrapping_Paper_NH_Icon.png' },
   { name: 'Gray Wrapping Paper', color: 'Gray', imageUrl: 'https://dodo.ac/np/images/thumb/e/ee/Gray_Wrapping_Paper_NH_Icon.png/60px-Gray_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/e/ee/Gray_Wrapping_Paper_NH_Icon.png/60px-Gray_Wrapping_Paper_NH_Icon.png' },
-  { name: 'Green Wrapping Paper', color: 'Green', imageUrl: 'https://cdn.nookazon.com/128x128/nookazon/MenuIcon/WPaperGreen.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://cdn.nookazon.com/128x128/nookazon/MenuIcon/WPaperGreen.png' },
+  { name: 'Green Wrapping Paper', color: 'Green', imageUrl: 'https://dodo.ac/np/images/thumb/e/ef/Green_Wrapping_Paper_NH_Icon.png/60px-Green_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/e/ef/Green_Wrapping_Paper_NH_Icon.png/60px-Green_Wrapping_Paper_NH_Icon.png' },
   { name: 'Light-Blue Wrapping Paper', color: 'Light-Blue', imageUrl: 'https://dodo.ac/np/images/thumb/f/f6/Light-Blue_Wrapping_Paper_NH_Icon.png/60px-Light-Blue_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/f/f6/Light-Blue_Wrapping_Paper_NH_Icon.png/60px-Light-Blue_Wrapping_Paper_NH_Icon.png' },
   { name: 'Mint Wrapping Paper', color: 'Mint', imageUrl: 'https://dodo.ac/np/images/thumb/2/2f/Mint_Wrapping_Paper_NH_Icon.png/60px-Mint_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/2/2f/Mint_Wrapping_Paper_NH_Icon.png/60px-Mint_Wrapping_Paper_NH_Icon.png' },
   { name: 'Navy Wrapping Paper', color: 'Navy', imageUrl: 'https://dodo.ac/np/images/thumb/3/3f/Navy_Wrapping_Paper_NH_Icon.png/60px-Navy_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/3/3f/Navy_Wrapping_Paper_NH_Icon.png/60px-Navy_Wrapping_Paper_NH_Icon.png' },
@@ -35,7 +35,7 @@ const WRAPPING_PAPERS: WrappingPaper[] = [
   { name: 'Purple Wrapping Paper', color: 'Purple', imageUrl: 'https://dodo.ac/np/images/thumb/e/ed/Purple_Wrapping_Paper_NH_Icon.png/60px-Purple_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/e/ed/Purple_Wrapping_Paper_NH_Icon.png/60px-Purple_Wrapping_Paper_NH_Icon.png' },
   { name: 'Red Wrapping Paper', color: 'Red', imageUrl: 'https://dodo.ac/np/images/thumb/f/f0/Red_Wrapping_Paper_NH_Icon.png/60px-Red_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/f/f0/Red_Wrapping_Paper_NH_Icon.png/60px-Red_Wrapping_Paper_NH_Icon.png' },
   { name: 'White Wrapping Paper', color: 'White', imageUrl: 'https://dodo.ac/np/images/thumb/4/4b/White_Wrapping_Paper_NH_Icon.png/60px-White_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/4/4b/White_Wrapping_Paper_NH_Icon.png/60px-White_Wrapping_Paper_NH_Icon.png' },
-  { name: 'Yellow Wrapping Paper', color: 'Yellow', imageUrl: 'https://dodo.ac/np/images/thumb/0/0c/Yellow_Wrapping_Paper_NH_Icon.png/60px-Yellow_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/0/0c/Yellow_Wrapping_Paper_NH_Icon.png/60px-Yellow_Wrapping_Paper_NH_Icon.png' },
+  { name: 'Yellow Wrapping Paper', color: 'Yellow', imageUrl: 'https://dodo.ac/np/images/thumb/8/8c/Yellow_Wrapping_Paper_NH_Icon.png/60px-Yellow_Wrapping_Paper_NH_Icon.png', singlePrice: 160, bundlePrice: 800, imageUrlPaper: 'https://dodo.ac/np/images/thumb/8/8c/Yellow_Wrapping_Paper_NH_Icon.png/60px-Yellow_Wrapping_Paper_NH_Icon.png' },
 ]
 
 export function VillagerInteractPage() {
@@ -150,7 +150,9 @@ export function VillagerInteractPage() {
       }
     }
 
-    localStorage.setItem(`villager_chat_log_${updatedVillager.id}`, JSON.stringify(chatLog))
+    if (villager) {
+      localStorage.setItem(`villager_chat_log_${villager.id}`, JSON.stringify(chatLog))
+    }
   }
 
   useEffect(() => {
@@ -174,7 +176,7 @@ export function VillagerInteractPage() {
     { name: 'Simple Parka', category: 'Clothing', imageUrl: 'https://dodo.ac/np/images/thumb/8/82/Simple_Parka_%28Black%29_NH_Icon.png/60px-Simple_Parka_%28Black%29_NH_Icon.png', matchType: 'good', matchDetails: `Style: Simple • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
     { name: 'Tweed Vest', category: 'Clothing', imageUrl: 'https://dodo.ac/np/images/thumb/5/5a/Tweed_Vest_%28Brown%29_NH_Icon.png/60px-Tweed_Vest_%28Brown%29_NH_Icon.png', matchType: 'good', matchDetails: `Style: Formal • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
     { name: 'Throwback Skull Radio', category: 'Housewares', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/e/ee/Gray_Wrapping_Paper_NH_Icon.png/60px-Gray_Wrapping_Paper_NH_Icon.png', matchType: 'good', matchDetails: `Style: Quirky • Color: ${villager?.colors?.[1] || 'Favorite 2'}` },
-    { name: 'Dolly', category: 'Housewares', imageUrl: 'https://cdn.nookazon.com/128x128/nookazon/MenuIcon/WPaperGreen.png', matchType: 'good', matchDetails: `Style: Cute • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
+    { name: 'Dolly', category: 'Housewares', imageUrl: 'https://dodo.ac/np/images/thumb/e/ef/Green_Wrapping_Paper_NH_Icon.png/60px-Green_Wrapping_Paper_NH_Icon.png', matchType: 'good', matchDetails: `Style: Cute • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
     { name: 'Cardboard Box', category: 'Misc', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/f/f6/Light-Blue_Wrapping_Paper_NH_Icon.png/60px-Light-Blue_Wrapping_Paper_NH_Icon.png', matchType: 'good', matchDetails: `Style: Basic • Color: ${villager?.colors?.[1] || 'Favorite 2'}` },
     { name: 'Standard Umbrella', category: 'Umbrellas', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/2/2f/Mint_Wrapping_Paper_NH_Icon.png/60px-Mint_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: Neutral • Color: Unmatched' },
     { name: 'Fresh Fruit', category: 'Food/Fruit', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/3/3f/Navy_Wrapping_Paper_NH_Icon.png/60px-Navy_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: Natural • Color: Unmatched' },
@@ -243,7 +245,7 @@ export function VillagerInteractPage() {
     else if (item.matchType === 'good') matchBonus = 2
 
     const pointsDelta = matchBonus + wrapBonus
-    const newPoints = Math.max(0, (villager.friendshipPoints ?? 0) + pointsDelta)
+    const newPoints = Math.min(255, Math.max(0, (villager.friendshipPoints ?? 0) + pointsDelta))
     const updatedVillager = { ...villager, friendshipPoints: newPoints }
     
     updateVillagerStateAndStorage(updatedVillager)
@@ -284,7 +286,7 @@ export function VillagerInteractPage() {
       giftText = ` with an attached gift (${letterGift.name}${isWrapped ? ` wrapped in ${selectedPaper.name}` : ''})`
     }
 
-    const newPoints = Math.max(0, (villager.friendshipPoints ?? 0) + pointsDelta)
+    const newPoints = Math.min(255, Math.max(0, (villager.friendshipPoints ?? 0) + pointsDelta))
     const updatedVillager = { ...villager, friendshipPoints: newPoints }
     
     updateVillagerStateAndStorage(updatedVillager)
@@ -343,7 +345,7 @@ export function VillagerInteractPage() {
         break
     }
 
-    const newPoints = Math.max(0, (villager.friendshipPoints ?? 0) + pointsDelta)
+    const newPoints = Math.min(255, Math.max(0, (villager.friendshipPoints ?? 0) + pointsDelta))
     const updatedVillager = { ...villager, friendshipPoints: newPoints }
     
     updateVillagerStateAndStorage(updatedVillager)
@@ -377,7 +379,7 @@ export function VillagerInteractPage() {
       }
     })
 
-    const newPoints = Math.max(0, (villager.friendshipPoints ?? 0) - totalPointsToSubtract)
+    const newPoints = Math.min(255, Math.max(0, (villager.friendshipPoints ?? 0) - totalPointsToSubtract))
     const updatedVillager = { ...villager, friendshipPoints: newPoints }
     updateVillagerStateAndStorage(updatedVillager)
 
