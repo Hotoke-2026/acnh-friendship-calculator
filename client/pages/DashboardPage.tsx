@@ -9,7 +9,6 @@ export function DashboardPage() {
   const navigate = useNavigate()
   const { logout, loginWithRedirect, user, isAuthenticated, isLoading: authLoading } = useAuth0()
   
-  // Replace useVillagers with direct localStorage state
   const [villagers, setVillagers] = useState<SavedVillager[]>([])
 
   useEffect(() => {
