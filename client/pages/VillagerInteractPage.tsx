@@ -60,7 +60,6 @@ export function VillagerInteractPage() {
   const [isInteracting, setIsInteracting] = useState(false)
   const [showApologyPopup, setShowApologyPopup] = useState(false)
 
-  // Gift & Letter Modal States
   const [isGiftModalOpen, setIsGiftModalOpen] = useState(false)
   const [isLetterModalOpen, setIsLetterModalOpen] = useState(false)
   const [clothingItems, setClothingItems] = useState<ClothingItem[]>([])
@@ -69,43 +68,61 @@ export function VillagerInteractPage() {
   const [selectedPaper, setSelectedPaper] = useState<WrappingPaper>(WRAPPING_PAPERS[13])
   const [selectedItem, setSelectedItem] = useState<ClothingItem | null>(null)
 
-  // Letter specific states
   const [letterText, setLetterText] = useState('')
   const [attachGift, setAttachGift] = useState(false)
   const [letterGift, setLetterGift] = useState<ClothingItem | null>(null)
 
-  useEffect(() => {
+  const loadVillagers = () => {
     const saved = localStorage.getItem('user_saved_villagers')
     if (saved) {
       try {
         const villagersList: SavedVillager[] = JSON.parse(saved)
-        // Robust match checking both v.id and slugified/lowercase name
         const found = villagersList.find((v) => {
-          const villagerId = v.id || v.name.toLowerCase().replace(/\s+/g, '-')
-          return villagerId === id || v.name.toLowerCase() === id?.toLowerCase()
+          const vId = v.id || v.name.toLowerCase().replace(/\s+/g, '-')
+          return vId === id
         })
-
         if (found) {
           setVillager(found)
-          const savedPaperName = localStorage.getItem(`villager_wrap_${found.id}`)
-          if (savedPaperName) {
-            const matchPaper = WRAPPING_PAPERS.find(p => p.name === savedPaperName)
-            if (matchPaper) setSelectedPaper(matchPaper)
-          }
-
-          if (chatLog.length === 0) {
-            const initialEntry: ChatLogEntry = {
-              id: 'init',
-              sender: 'system',
-              text: `You walk up to ${found.name}. They wave hello with a bright smile!`,
-              timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }
-            setChatLog([initialEntry])
-          }
         }
+        return villagersList
       } catch (err) {
-        console.error('Failed to parse villagers from storage', err)
+        console.error('Failed to load villagers from storage', err)
       }
+    }
+    return []
+  }
+
+  useEffect(() => {
+    loadVillagers()
+
+    const handleFocus = () => loadVillagers()
+    const handleStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === 'user_saved_villagers') {
+        loadVillagers()
+      }
+    }
+    const handleCustomVillagerUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent
+      if (customEvent.detail) {
+        const list: SavedVillager[] = Array.isArray(customEvent.detail) ? customEvent.detail : []
+        const found = list.find((v) => {
+          const vId = v.id || v.name.toLowerCase().replace(/\s+/g, '-')
+          return vId === id
+        })
+        if (found) setVillager(found)
+      } else {
+        loadVillagers()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    window.addEventListener('storage', handleStorage as EventListener)
+    window.addEventListener('villagers_updated', handleCustomVillagerUpdate as EventListener)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('storage', handleStorage as EventListener)
+      window.removeEventListener('villagers_updated', handleCustomVillagerUpdate as EventListener)
     }
   }, [id])
 
@@ -122,10 +139,12 @@ export function VillagerInteractPage() {
           return vId === targetId ? updatedVillager : v
         })
         localStorage.setItem('user_saved_villagers', JSON.stringify(updatedList))
+        
         window.dispatchEvent(new StorageEvent('storage', {
           key: 'user_saved_villagers',
           newValue: JSON.stringify(updatedList)
         }))
+        window.dispatchEvent(new CustomEvent('villagers_updated', { detail: updatedList }))
       } catch (err) {
         console.error('Failed to update storage', err)
       }
@@ -145,6 +164,24 @@ export function VillagerInteractPage() {
       localStorage.setItem(`villager_wrap_${villager.id}`, paper.name)
     }
   }
+
+  const getFallbackGifts = (): ClothingItem[] => [
+    { name: 'Grand Piano', category: 'Furniture', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/e/e4/Black_Wrapping_Paper_NH_Icon.png/60px-Black_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: ${villager?.styles?.[0] || 'Music'} • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
+    { name: 'Helicopter Toy', category: 'Misc', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/a/a2/Blue_Wrapping_Paper_NH_Icon.png/60px-Blue_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: ${villager?.styles?.[1] || 'Hobby'} • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
+    { name: 'Iron Wall Lamp', category: 'Wall-mounted', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/8/87/Brown_Wrapping_Paper_NH_Icon.png/60px-Brown_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: Industrial • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
+    { name: 'Terrarium', category: 'Housewares', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/7/7b/Chartreuse_Wrapping_Paper_NH_Icon.png/60px-Chartreuse_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: Nature • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
+    { name: 'Royal Crown', category: 'Headwear', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/e/e4/Gold_Wrapping_Paper_NH_Icon.png/60px-Gold_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: Gorgeous • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
+    { name: 'Simple Parka', category: 'Clothing', imageUrl: 'https://dodo.ac/np/images/thumb/8/82/Simple_Parka_%28Black%29_NH_Icon.png/60px-Simple_Parka_%28Black%29_NH_Icon.png', matchType: 'good', matchDetails: `Style: Simple • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
+    { name: 'Tweed Vest', category: 'Clothing', imageUrl: 'https://dodo.ac/np/images/thumb/5/5a/Tweed_Vest_%28Brown%29_NH_Icon.png/60px-Tweed_Vest_%28Brown%29_NH_Icon.png', matchType: 'good', matchDetails: `Style: Formal • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
+    { name: 'Throwback Skull Radio', category: 'Housewares', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/e/ee/Gray_Wrapping_Paper_NH_Icon.png/60px-Gray_Wrapping_Paper_NH_Icon.png', matchType: 'good', matchDetails: `Style: Quirky • Color: ${villager?.colors?.[1] || 'Favorite 2'}` },
+    { name: 'Dolly', category: 'Housewares', imageUrl: 'https://cdn.nookazon.com/128x128/nookazon/MenuIcon/WPaperGreen.png', matchType: 'good', matchDetails: `Style: Cute • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
+    { name: 'Cardboard Box', category: 'Misc', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/f/f6/Light-Blue_Wrapping_Paper_NH_Icon.png/60px-Light-Blue_Wrapping_Paper_NH_Icon.png', matchType: 'good', matchDetails: `Style: Basic • Color: ${villager?.colors?.[1] || 'Favorite 2'}` },
+    { name: 'Standard Umbrella', category: 'Umbrellas', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/2/2f/Mint_Wrapping_Paper_NH_Icon.png/60px-Mint_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: Neutral • Color: Unmatched' },
+    { name: 'Fresh Fruit', category: 'Food/Fruit', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/3/3f/Navy_Wrapping_Paper_NH_Icon.png/60px-Navy_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: Natural • Color: Unmatched' },
+    { name: 'Clump of Weeds', category: 'Materials', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/5/5a/Orange_Wrapping_Paper_NH_Icon.png/60px-Orange_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: None • Color: Unmatched' },
+    { name: 'Tree Branch', category: 'Materials', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/1/1a/Pink_Wrapping_Paper_NH_Icon.png/60px-Pink_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: None • Color: Unmatched' },
+    { name: 'Sea Shell', category: 'Materials', imageUrl: selectedPaper?.imageUrl || 'https://dodo.ac/np/images/thumb/e/ed/Purple_Wrapping_Paper_NH_Icon.png/60px-Purple_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: None • Color: Unmatched' },
+  ]
 
   const fetchClothingOptions = async () => {
     setIsLoadingClothing(true)
@@ -196,24 +233,6 @@ export function VillagerInteractPage() {
     setIsLetterModalOpen(true)
     await fetchClothingOptions()
   }
-
-  const getFallbackGifts = (): ClothingItem[] => [
-    { name: 'Grand Piano', category: 'Furniture', imageUrl: 'https://dodo.ac/np/images/thumb/e/e4/Black_Wrapping_Paper_NH_Icon.png/60px-Black_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: ${villager?.styles?.[0] || 'Music'} • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
-    { name: 'Helicopter Toy', category: 'Misc', imageUrl: 'https://dodo.ac/np/images/thumb/a/a2/Blue_Wrapping_Paper_NH_Icon.png/60px-Blue_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: ${villager?.styles?.[1] || 'Hobby'} • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
-    { name: 'Iron Wall Lamp', category: 'Wall-mounted', imageUrl: 'https://dodo.ac/np/images/thumb/8/87/Brown_Wrapping_Paper_NH_Icon.png/60px-Brown_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: Industrial • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
-    { name: 'Terrarium', category: 'Housewares', imageUrl: 'https://dodo.ac/np/images/thumb/7/7b/Chartreuse_Wrapping_Paper_NH_Icon.png/60px-Chartreuse_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: Nature • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
-    { name: 'Royal Crown', category: 'Headwear', imageUrl: 'https://dodo.ac/np/images/thumb/e/e4/Gold_Wrapping_Paper_NH_Icon.png/60px-Gold_Wrapping_Paper_NH_Icon.png', matchType: 'perfect', matchDetails: `Style: Gorgeous • Colors: ${villager?.colors?.join(' & ') || 'Matching'}` },
-    { name: 'Simple Parka', category: 'Clothing', imageUrl: 'https://dodo.ac/np/images/thumb/8/82/Simple_Parka_%28Black%29_NH_Icon.png/60px-Simple_Parka_%28Black%29_NH_Icon.png', matchType: 'good', matchDetails: `Style: Simple • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
-    { name: 'Tweed Vest', category: 'Clothing', imageUrl: 'https://dodo.ac/np/images/thumb/5/5a/Tweed_Vest_%28Brown%29_NH_Icon.png/60px-Tweed_Vest_%28Brown%29_NH_Icon.png', matchType: 'good', matchDetails: `Style: Formal • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
-    { name: 'Throwback Skull Radio', category: 'Housewares', imageUrl: 'https://dodo.ac/np/images/thumb/e/ee/Gray_Wrapping_Paper_NH_Icon.png/60px-Gray_Wrapping_Paper_NH_Icon.png', matchType: 'good', matchDetails: `Style: Quirky • Color: ${villager?.colors?.[1] || 'Favorite 2'}` },
-    { name: 'Dolly', category: 'Housewares', imageUrl: 'https://cdn.nookazon.com/128x128/nookazon/MenuIcon/WPaperGreen.png', matchType: 'good', matchDetails: `Style: Cute • Color: ${villager?.colors?.[0] || 'Favorite 1'}` },
-    { name: 'Cardboard Box', category: 'Misc', imageUrl: 'https://dodo.ac/np/images/thumb/f/f6/Light-Blue_Wrapping_Paper_NH_Icon.png/60px-Light-Blue_Wrapping_Paper_NH_Icon.png', matchType: 'good', matchDetails: `Style: Basic • Color: ${villager?.colors?.[1] || 'Favorite 2'}` },
-    { name: 'Standard Umbrella', category: 'Umbrellas', imageUrl: 'https://dodo.ac/np/images/thumb/2/2f/Mint_Wrapping_Paper_NH_Icon.png/60px-Mint_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: Neutral • Color: Unmatched' },
-    { name: 'Fresh Fruit', category: 'Food/Fruit', imageUrl: 'https://dodo.ac/np/images/thumb/3/3f/Navy_Wrapping_Paper_NH_Icon.png/60px-Navy_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: Natural • Color: Unmatched' },
-    { name: 'Clump of Weeds', category: 'Materials', imageUrl: 'https://dodo.ac/np/images/thumb/5/5a/Orange_Wrapping_Paper_NH_Icon.png/60px-Orange_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: None • Color: Unmatched' },
-    { name: 'Tree Branch', category: 'Materials', imageUrl: 'https://dodo.ac/np/images/thumb/1/1a/Pink_Wrapping_Paper_NH_Icon.png/60px-Pink_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: None • Color: Unmatched' },
-    { name: 'Sea Shell', category: 'Materials', imageUrl: 'https://dodo.ac/np/images/thumb/e/ed/Purple_Wrapping_Paper_NH_Icon.png/60px-Purple_Wrapping_Paper_NH_Icon.png', matchType: 'okay', matchDetails: 'Style: None • Color: Unmatched' },
-  ]
 
   const handleGiveGift = (item: ClothingItem) => {
     if (!villager) return
@@ -404,7 +423,6 @@ export function VillagerInteractPage() {
         </div>
       </div>
 
-      {/* Wrapping Color Assignment Card */}
       <div className="summary-card" style={{ backgroundColor: '#FAF7F2', padding: '0.75rem 1rem', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#2D2B2A' }}>🎁 Preferred Gift Wrapping</div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
@@ -540,7 +558,6 @@ export function VillagerInteractPage() {
         ✓ Changes saved automatically
       </div>
 
-      {/* Gift Selection Modal */}
       {isGiftModalOpen && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
           <div className="summary-card" style={{ width: '100%', maxWidth: '440px', backgroundColor: '#FFF', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
@@ -647,7 +664,6 @@ export function VillagerInteractPage() {
         </div>
       )}
 
-      {/* Send Letter Modal with Optional Gift Attachment */}
       {isLetterModalOpen && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
           <div className="summary-card" style={{ width: '100%', maxWidth: '440px', backgroundColor: '#FFF', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
