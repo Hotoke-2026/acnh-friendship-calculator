@@ -11,13 +11,12 @@ export function DashboardPage() {
   const { data: villagers = [], refetch } = useVillagers()
   const [, setTick] = useState(0)
 
-  // Re-fetch or force re-render whenever the window regains focus (coming back from interaction page)
   useEffect(() => {
     const handleFocus = () => {
       if (typeof refetch === 'function') {
         refetch()
       } else {
-        setTick((t) => t + 1) // forces a re-render if using localStorage underneath
+        setTick((t) => t + 1)
       }
     }
 
@@ -78,7 +77,6 @@ export function DashboardPage() {
             <h2>Island friendships</h2>
             <p>Keep growing your favorite bonds</p>
           </div>
-          <span className="level-badge">LEVEL 4</span>
         </div>
 
         <div className="stats-grid">

@@ -32,10 +32,6 @@ export function VillagerCard({ villager }: VillagerCardProps) {
           <div className="friendship-status">❤️ {villager.friendshipPoints ?? 0} pts</div>
         </div>
       </Link>
-
-      <Link to={`/villagers/${villagerId}/interact`} className="gift-link" title={`Interact with ${villager.name}`}>
-        🎁
-      </Link>
     </div>
   )
 }

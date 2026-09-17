@@ -79,7 +79,12 @@ export function VillagerInteractPage() {
     if (saved) {
       try {
         const villagersList: SavedVillager[] = JSON.parse(saved)
-        const found = villagersList.find((v) => v.id === id)
+        // Robust match checking both v.id and slugified/lowercase name
+        const found = villagersList.find((v) => {
+          const villagerId = v.id || v.name.toLowerCase().replace(/\s+/g, '-')
+          return villagerId === id || v.name.toLowerCase() === id?.toLowerCase()
+        })
+
         if (found) {
           setVillager(found)
           const savedPaperName = localStorage.getItem(`villager_wrap_${found.id}`)
@@ -111,7 +116,11 @@ export function VillagerInteractPage() {
     if (saved) {
       try {
         const villagersList: SavedVillager[] = JSON.parse(saved)
-        const updatedList = villagersList.map((v) => (v.id === updatedVillager.id ? updatedVillager : v))
+        const updatedList = villagersList.map((v) => {
+          const vId = v.id || v.name.toLowerCase().replace(/\s+/g, '-')
+          const targetId = updatedVillager.id || updatedVillager.name.toLowerCase().replace(/\s+/g, '-')
+          return vId === targetId ? updatedVillager : v
+        })
         localStorage.setItem('user_saved_villagers', JSON.stringify(updatedList))
         window.dispatchEvent(new StorageEvent('storage', {
           key: 'user_saved_villagers',

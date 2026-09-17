@@ -4,7 +4,7 @@ import { VillagerCategory, SavedVillager } from '../components/models/villager'
 
 const INITIAL_VILLAGERS: SavedVillager[] = [
   {
-    id: '1',
+    id: 'muffy',
     name: 'Muffy',
     species: 'Sheep',
     icon: 'https://dodo.ac/np/images/7/73/Muffy_NH_Villager_Icon.png',
@@ -15,7 +15,7 @@ const INITIAL_VILLAGERS: SavedVillager[] = [
     colors: ['Black', 'Purple'],
   },
   {
-    id: '3',
+    id: 'bruce',
     name: 'Bruce',
     species: 'Deer',
     icon: 'https://dodo.ac/np/images/9/9b/Bruce_NH_Villager_Icon.png',
@@ -26,7 +26,7 @@ const INITIAL_VILLAGERS: SavedVillager[] = [
     colors: ['Blue', 'Black'],
   },
   {
-    id: '4',
+    id: 'teddy',
     name: 'Teddy',
     species: 'Bear',
     icon: 'https://dodo.ac/np/images/b/bd/Teddy_NH_Villager_Icon.png',
@@ -116,8 +116,9 @@ export function VillagerListPage() {
   const handleAddVillager = (category: VillagerCategory) => {
     if (!selectedVillager) return
 
+    const villagerId = selectedVillager.name.toLowerCase().replace(/\s+/g, '-')
     const newVillager: SavedVillager = {
-      id: selectedVillager.name.toLowerCase().replace(/\s+/g, '-'),
+      id: villagerId,
       name: selectedVillager.name,
       species: selectedVillager.species,
       icon: selectedVillager.nh_details?.icon_url || '',
@@ -200,30 +201,36 @@ export function VillagerListPage() {
             No {activeTab.toLowerCase()} villagers added yet. Click <strong>+</strong> to search and add one!
           </div>
         ) : (
-          displayedVillagers.map((v) => (
-            <div
-              key={v.id}
-              className="summary-card"
-              onClick={() => navigate(`/villagers/${v.id || v.name.toLowerCase().replace(/\s+/g, '-')}/interact`)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') navigate(`/villagers/${v.id}/interact`)
-              }}
-              role="button"
-              tabIndex={0}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem' }}
-            >
-              <img src={v.icon} alt={v.name} style={{ width: '48px', height: '48px', borderRadius: '50%' }} />
-              <div style={{ flex: 1 }}>
-                <h4 style={{ margin: 0, fontSize: '1rem', color: '#2D2B2A' }}>{v.name}</h4>
-                <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.75rem', color: '#7A756C' }}>{v.species}</p>
-              </div>
-              {v.category === 'CURRENT' && (
-                <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#E87A5D' }}>
-                  ❤️ {v.friendshipPoints ?? 0} pts
+          displayedVillagers.map((v) => {
+            const villagerId = v.id || v.name.toLowerCase().replace(/\s+/g, '-')
+
+            return (
+              <div
+                key={villagerId}
+                className="summary-card"
+                onClick={() => navigate(`/villagers/${villagerId}/interact`)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    navigate(`/villagers/${villagerId}/interact`)
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem' }}
+              >
+                <img src={v.icon} alt={v.name} style={{ width: '48px', height: '48px', borderRadius: '50%' }} />
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ margin: 0, fontSize: '1rem', color: '#2D2B2A' }}>{v.name}</h4>
+                  <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.75rem', color: '#7A756C' }}>{v.species}</p>
                 </div>
-              )}
-            </div>
-          ))
+                {v.category === 'CURRENT' && (
+                  <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#E87A5D' }}>
+                    ❤️ {v.friendshipPoints ?? 0} pts
+                  </div>
+                )}
+              </div>
+            )
+          })
         )}
       </div>
 
