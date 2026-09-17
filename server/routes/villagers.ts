@@ -20,35 +20,6 @@ router.get('/', checkJwt, async (req, res) => {
   }
 })
 
-router.get('/search', checkJwt, async (req, res) => {
-  try {
-    const nameQuery = req.query.name as string
-    if (!nameQuery) {
-      return res.status(400).json({ message: 'Name query parameter is required' })
-    }
-
-    const response = await request
-      .get('https://api.nookipedia.com/villagers')
-      .query({ 
-        name: nameQuery,
-        nhdetails: 'true' 
-      })
-      .set('X-API-KEY', process.env.NOOKIPEDIA_API_KEY || '')
-      .set('Accept-Version', '1.0.0')
-
-    res.json(response.body)
-  } catch (err: any) {
-    console.error('Error searching Nookipedia API:', err)
-
-    if (err.code === 'EAI_AGAIN' || err.syscall === 'getaddrinfo') {
-      return res.status(503).json({ message: 'Network error: Unable to reach Nookipedia API' })
-    }
-
-    res.status(500).json({ message: 'Error searching for villagers' })
-  }
-})
-
-// Route for individual villager gift options page
 router.get('/:id/gift-options', checkJwt, async (req, res) => {
   try {
     const id = Number(req.params.id)

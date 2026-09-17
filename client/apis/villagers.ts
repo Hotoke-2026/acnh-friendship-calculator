@@ -9,12 +9,12 @@ export async function fetchVillagers(token: string): Promise<Villager[]> {
 }
 
 export async function interactWithVillager(
-  id: number,
+  name:string,
   payload: InteractionPayload,
   token: string
 ): Promise<Villager> {
   const res = await request
-    .post(`/api/v1/villagers/${id}/interact`)
+    .post(`/api/v1/villagers/${name}/interact`)
     .set('Authorization', `Bearer ${token}`)
     .send(payload)
   return res.body

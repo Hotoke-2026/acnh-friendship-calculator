@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
 import { VillagerCategory, SavedVillager } from '../components/models/villager'
 
 const INITIAL_VILLAGERS: SavedVillager[] = [
@@ -48,6 +49,7 @@ interface VillagerSearchResult {
 
 export function VillagerListPage() {
   const navigate = useNavigate()
+  const { getAccessTokenSilently } = useAuth0()
 
   const [activeTab, setActiveTab] = useState<VillagerCategory>('CURRENT')
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -102,7 +104,14 @@ export function VillagerListPage() {
 
     setIsSearching(true)
     try {
-      const res = await fetch(`/api/v1/nookipedia/villagers?name=${encodeURIComponent(searchQuery)}`)
+      const token = await getAccessTokenSilently()
+
+      const res = await fetch(`/api/v1/nookipedia/search?name=${encodeURIComponent(searchQuery)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
       if (!res.ok) throw new Error('Nookipedia request failed')
       const data = await res.json()
       setSearchResults(Array.isArray(data) ? data : [data])
@@ -137,7 +146,7 @@ export function VillagerListPage() {
     setIsModalOpen(false)
   }
 
-  const displayedVillagers = villagers.filter((v) => v.category === activeTab)
+  const displayedVillagers = villagers.filter((v: SavedVillager) => v.category === activeTab)
 
   return (
     <div className="app-container">
@@ -251,14 +260,19 @@ export function VillagerListPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Search & Add Villager</h3>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false)
+                  setSearchResults([])
+                  setSearchQuery('')
+                  setSelectedVillager(null)
+                }}
                 style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#7A756C' }}
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+            <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
               <input
                 type="text"
                 placeholder="Search villager name..."
@@ -275,38 +289,65 @@ export function VillagerListPage() {
               </button>
             </form>
 
-            <div style={{ maxHeight: '180px', overflowY: 'auto', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              {searchResults.map((res) => (
-                <div
-                  key={res.name}
-                  onClick={() => setSelectedVillager(res)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') setSelectedVillager(res)
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '0.5rem',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    backgroundColor: selectedVillager?.name === res.name ? '#EAF3EC' : '#FAF7F2',
-                    border: selectedVillager?.name === res.name ? '1px solid #2D4B43' : '1px solid transparent',
+            {searchResults.length > 0 && (
+              <div style={{ position: 'relative', marginBottom: '1rem' }}>
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    top: 0, 
+                    left: 0, 
+                    right: 0, 
+                    maxHeight: '180px', 
+                    overflowY: 'auto', 
+                    backgroundColor: '#FFF', 
+                    border: '1px solid #E0DAD0', 
+                    borderRadius: '8px', 
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+                    zIndex: 20, 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '0.2rem',
+                    padding: '0.3rem'
                   }}
                 >
-                  <img src={res.nh_details?.icon_url} alt={res.name} style={{ width: '36px', height: '36px', borderRadius: '50%' }} />
-                  <div>
-                    <strong style={{ fontSize: '0.85rem', color: '#2D2B2A' }}>{res.name}</strong>
-                    <div style={{ fontSize: '0.7rem', color: '#7A756C' }}>{res.species}</div>
-                  </div>
+                  {searchResults.map((res) => (
+                    <div
+                      key={res.name}
+                      onClick={() => {
+                        setSelectedVillager(res)
+                        setSearchResults([])
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          setSelectedVillager(res)
+                          setSearchResults([])
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        padding: '0.4rem 0.6rem',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        backgroundColor: selectedVillager?.name === res.name ? '#EAF3EC' : 'transparent',
+                      }}
+                    >
+                      <img src={res.nh_details?.icon_url} alt={res.name} style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
+                      <div>
+                        <strong style={{ fontSize: '0.85rem', color: '#2D2B2A' }}>{res.name}</strong>
+                        <div style={{ fontSize: '0.7rem', color: '#7A756C' }}>{res.species}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
 
             {selectedVillager && (
-              <div style={{ borderTop: '1px solid #EEE', paddingTop: '0.75rem' }}>
+              <div style={{ borderTop: '1px solid #EEE', paddingTop: '0.75rem', marginTop: searchResults.length > 0 ? '190px' : '0' }}>
                 <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', fontWeight: 'bold', color: '#2D2B2A' }}>
                   Save {selectedVillager.name} as:
                 </p>

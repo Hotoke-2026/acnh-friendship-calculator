@@ -6,12 +6,12 @@ interface VillagerCardProps {
 }
 
 export function VillagerCard({ villager }: VillagerCardProps) {
-  const villagerId = villager.id || villager.name.toLowerCase().replace(/\s+/g, '-')
+  const villagerName = villager.name.toLowerCase().replace(/\s+/g, '-')
 
   return (
     <div className="villager-card">
       <Link 
-        to={`/villagers/${villagerId}/interact`} 
+        to={`/villagers/${villagerName}/interact`} 
         className="villager-info" 
         style={{ textDecoration: 'none', color: 'inherit', flex: 1, display: 'flex', alignItems: 'center', gap: '1rem' }}
       >
