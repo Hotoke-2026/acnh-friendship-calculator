@@ -6,29 +6,31 @@ interface VillagerCardProps {
 }
 
 export function VillagerCard({ villager }: VillagerCardProps) {
+  const villagerId = villager.id || villager.name.toLowerCase().replace(/\s+/g, '-')
+
   return (
     <div className="villager-card">
-      <div className="villager-info">
-        <img src={villager.icon} alt={villager.name} className="villager-icon" />
+      <Link 
+        to={`/villagers/${villagerId}/interact`} 
+        className="villager-info" 
+        style={{ textDecoration: 'none', color: 'inherit', flex: 1, display: 'flex', alignItems: 'center', gap: '1rem' }}
+      >
+        <img 
+          src={villager.imageUrl || villager.icon} 
+          alt={villager.name}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.dataset.hasFailed) {
+              target.dataset.hasFailed = 'true';
+              target.src = '/path/to/local/fallback-avatar.png';
+            }
+          }}
+        />
         <div>
           <h4>{villager.name}</h4>
           <span className="species">{villager.species}</span>
-          {villager.styles && villager.colors && (
-            <div className="villager-tags" style={{ display: 'flex', gap: '0.25rem', margin: '0.25rem 0', flexWrap: 'wrap' }}>
-              <span className="tag style-tag" style={{ fontSize: '0.75rem', color: '#666' }}>
-                ✨ {villager.styles.join(', ')}
-              </span>
-              <span className="tag color-tag" style={{ fontSize: '0.75rem', color: '#666' }}>
-                🎨 {villager.colors.join(', ')}
-              </span>
-            </div>
-          )}
           <div className="friendship-status">❤️ {villager.friendshipPoints ?? 0} pts</div>
         </div>
-      </div>
-
-      <Link to={`/villagers/${villager.id}`} className="gift-link" title={`Interact with ${villager.name}`}>
-        🎁
       </Link>
     </div>
   )

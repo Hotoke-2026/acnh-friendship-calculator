@@ -1,17 +1,49 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { VillagerCategory, SavedVillager } from '../components/models/villager'
 
 const INITIAL_VILLAGERS: SavedVillager[] = [
-  { id: '1', name: 'Muffy', species: 'Sheep', icon: 'https://dodo.ac/np/images/7/73/Muffy_NH_Villager_Icon.png', category: 'CURRENT', friendshipPoints: 200 },
-  { id: '2', name: 'Bruce', species: 'Deer', icon: 'https://dodo.ac/np/images/9/9b/Bruce_NH_Villager_Icon.png', category: 'CURRENT', friendshipPoints: 180 },
-  { id: '3', name: 'Teddy', species: 'Bear', icon: 'https://dodo.ac/np/images/b/bd/Teddy_NH_Villager_Icon.png', category: 'CURRENT', friendshipPoints: 165 },
+  {
+    id: 'muffy',
+    name: 'Muffy',
+    species: 'Sheep',
+    icon: 'https://dodo.ac/np/images/7/73/Muffy_NH_Villager_Icon.png',
+    category: 'CURRENT',
+    friendshipPoints: 200,
+    imageUrl: '',
+    styles: ['Goth', 'Punky'],
+    colors: ['Black', 'Purple'],
+  },
+  {
+    id: 'bruce',
+    name: 'Bruce',
+    species: 'Deer',
+    icon: 'https://dodo.ac/np/images/9/9b/Bruce_NH_Villager_Icon.png',
+    category: 'CURRENT',
+    friendshipPoints: 65,
+    imageUrl: '',
+    styles: ['Simple', 'Active'],
+    colors: ['Blue', 'Black'],
+  },
+  {
+    id: 'teddy',
+    name: 'Teddy',
+    species: 'Bear',
+    icon: 'https://dodo.ac/np/images/b/bd/Teddy_NH_Villager_Icon.png',
+    category: 'CURRENT',
+    friendshipPoints: 25,
+    imageUrl: '',
+    styles: ['Active', 'Simple'],
+    colors: ['Red', 'Blue'],
+  },
 ]
 
 interface VillagerSearchResult {
   name: string
   species: string
-  image_url: string
+  nh_details?: {
+    icon_url: string
+  }
 }
 
 export function VillagerListPage() {
@@ -24,15 +56,40 @@ export function VillagerListPage() {
   const [isSearching, setIsSearching] = useState(false)
   const [selectedVillager, setSelectedVillager] = useState<VillagerSearchResult | null>(null)
 
-  const [villagers, setVillagers] = useState<SavedVillager[]>(() => {
+  const [villagers, setVillagers] = useState<SavedVillager[]>([])
+
+  const loadVillagers = () => {
     const saved = localStorage.getItem('user_saved_villagers')
-    if (!saved) return INITIAL_VILLAGERS
-    try {
-      return JSON.parse(saved)
-    } catch {
-      return INITIAL_VILLAGERS
+    if (!saved) {
+      setVillagers(INITIAL_VILLAGERS)
+      localStorage.setItem('user_saved_villagers', JSON.stringify(INITIAL_VILLAGERS))
+      return
     }
-  })
+    try {
+      setVillagers(JSON.parse(saved))
+    } catch {
+      setVillagers(INITIAL_VILLAGERS)
+    }
+  }
+
+  useEffect(() => {
+    loadVillagers()
+
+    const handleFocus = () => loadVillagers()
+    const handleStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === 'user_saved_villagers') {
+        loadVillagers()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    window.addEventListener('storage', handleStorage as EventListener)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('storage', handleStorage as EventListener)
+    }
+  }, [])
 
   const saveVillagersToStorage = (updatedList: SavedVillager[]) => {
     setVillagers(updatedList)
@@ -59,13 +116,15 @@ export function VillagerListPage() {
   const handleAddVillager = (category: VillagerCategory) => {
     if (!selectedVillager) return
 
+    const villagerId = selectedVillager.name.toLowerCase().replace(/\s+/g, '-')
     const newVillager: SavedVillager = {
-      id: selectedVillager.name.toLowerCase().replace(/\s+/g, '-'),
+      id: villagerId,
       name: selectedVillager.name,
       species: selectedVillager.species,
-      icon: selectedVillager.image_url,
+      icon: selectedVillager.nh_details?.icon_url || '',
       category,
       friendshipPoints: category === 'CURRENT' ? 25 : 0,
+      imageUrl: ''
     }
 
     const filtered = villagers.filter((v) => v.id !== newVillager.id)
@@ -142,30 +201,36 @@ export function VillagerListPage() {
             No {activeTab.toLowerCase()} villagers added yet. Click <strong>+</strong> to search and add one!
           </div>
         ) : (
-          displayedVillagers.map((v) => (
-            <div
-              key={v.id}
-              className="summary-card"
-              onClick={() => navigate(`/villagers/${v.id}`)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') navigate(`/villagers/${v.id}`)
-              }}
-              role="button"
-              tabIndex={0}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem' }}
-            >
-              <img src={v.icon} alt={v.name} style={{ width: '48px', height: '48px', borderRadius: '50%' }} />
-              <div style={{ flex: 1 }}>
-                <h4 style={{ margin: 0, fontSize: '1rem', color: '#2D2B2A' }}>{v.name}</h4>
-                <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.75rem', color: '#7A756C' }}>{v.species}</p>
-              </div>
-              {v.category === 'CURRENT' && (
-                <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#E87A5D' }}>
-                  ❤️ {v.friendshipPoints ?? 0}
+          displayedVillagers.map((v) => {
+            const villagerId = v.id || v.name.toLowerCase().replace(/\s+/g, '-')
+
+            return (
+              <div
+                key={villagerId}
+                className="summary-card"
+                onClick={() => navigate(`/villagers/${villagerId}/interact`)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    navigate(`/villagers/${villagerId}/interact`)
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem' }}
+              >
+                <img src={v.icon} alt={v.name} style={{ width: '48px', height: '48px', borderRadius: '50%' }} />
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ margin: 0, fontSize: '1rem', color: '#2D2B2A' }}>{v.name}</h4>
+                  <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.75rem', color: '#7A756C' }}>{v.species}</p>
                 </div>
-              )}
-            </div>
-          ))
+                {v.category === 'CURRENT' && (
+                  <div style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#E87A5D' }}>
+                    ❤️ {v.friendshipPoints ?? 0} pts
+                  </div>
+                )}
+              </div>
+            )
+          })
         )}
       </div>
 
@@ -231,7 +296,7 @@ export function VillagerListPage() {
                     border: selectedVillager?.name === res.name ? '1px solid #2D4B43' : '1px solid transparent',
                   }}
                 >
-                  <img src={res.image_url} alt={res.name} style={{ width: '36px', height: '36px', borderRadius: '50%' }} />
+                  <img src={res.nh_details?.icon_url} alt={res.name} style={{ width: '36px', height: '36px', borderRadius: '50%' }} />
                   <div>
                     <strong style={{ fontSize: '0.85rem', color: '#2D2B2A' }}>{res.name}</strong>
                     <div style={{ fontSize: '0.7rem', color: '#7A756C' }}>{res.species}</div>
@@ -262,7 +327,7 @@ export function VillagerListPage() {
                     onClick={() => handleAddVillager('DESIRED')}
                     style={{ padding: '0.5rem', borderRadius: '8px', border: '1px solid #CCC', backgroundColor: '#FAF7F2', fontSize: '0.8rem', cursor: 'pointer' }}
                   >
-                    ✨ Desired / Dreamie Villager
+                    ✨ Desired Villager
                   </button>
                 </div>
               </div>

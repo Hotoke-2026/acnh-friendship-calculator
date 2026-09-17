@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useVillagers } from '../hooks/useVillagers'
@@ -7,7 +8,21 @@ import { SavedVillager } from '../components/models/villager'
 export function DashboardPage() {
   const navigate = useNavigate()
   const { logout, loginWithRedirect, user, isAuthenticated, isLoading: authLoading } = useAuth0()
-  const { data: villagers = [] } = useVillagers()
+  const { data: villagers = [], refetch } = useVillagers()
+  const [, setTick] = useState(0)
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (typeof refetch === 'function') {
+        refetch()
+      } else {
+        setTick((t) => t + 1)
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [refetch])
 
   if (authLoading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Initializing Auth0...</div>
@@ -62,7 +77,6 @@ export function DashboardPage() {
             <h2>Island friendships</h2>
             <p>Keep growing your favorite bonds</p>
           </div>
-          <span className="level-badge">LEVEL 4</span>
         </div>
 
         <div className="stats-grid">

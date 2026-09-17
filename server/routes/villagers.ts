@@ -1,12 +1,13 @@
 import express from 'express'
 import { auth } from 'express-oauth2-jwt-bearer'
 import * as db from '../db/villagers'
+import request from 'superagent'
 
 const router = express.Router()
 
 const checkJwt = auth({
   audience: process.env.AUTH0_AUDIENCE || 'https://api.animalfriendship.com',
-  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://dev-lry3zg2sng8bwawa.au.auth0.com/',
+  issuerBaseURL: process.env.AUTH0_ISSUER_BASE_URL || 'https://hotoke2026-levi.au.auth0.com/',
   tokenSigningAlg: 'RS256',
 })
 
@@ -16,6 +17,29 @@ router.get('/', checkJwt, async (req, res) => {
     res.json(await db.getVillagersByUserId(userId))
   } catch {
     res.status(500).json({ message: 'Error fetching villagers' })
+  }
+})
+
+router.get('/search', checkJwt, async (req, res) => {
+  try {
+    const nameQuery = req.query.name as string
+    if (!nameQuery) {
+      return res.status(400).json({ message: 'Name query parameter is required' })
+    }
+
+    const response = await request
+      .get('https://api.nookipedia.com/villagers')
+      .query({ 
+        name: nameQuery,
+        nhdetails: 'true' 
+      })
+      .set('X-API-KEY', process.env.NOOKIPEDIA_API_KEY || '')
+      .set('Accept-Version', '1.0.0')
+
+    res.json(response.body)
+  } catch (err) {
+    console.error('Error searching Nookipedia API:', err)
+    res.status(500).json({ message: 'Error searching for villagers' })
   }
 })
 
