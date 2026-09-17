@@ -8,21 +8,39 @@ import { SavedVillager } from '../components/models/villager'
 export function DashboardPage() {
   const navigate = useNavigate()
   const { logout, loginWithRedirect, user, isAuthenticated, isLoading: authLoading } = useAuth0()
-  const { data: villagers = [], refetch } = useVillagers()
-  const [, setTick] = useState(0)
+  
+  // Replace useVillagers with direct localStorage state
+  const [villagers, setVillagers] = useState<SavedVillager[]>([])
 
   useEffect(() => {
-    const handleFocus = () => {
-      if (typeof refetch === 'function') {
-        refetch()
-      } else {
-        setTick((t) => t + 1)
+    const loadVillagers = () => {
+      const saved = localStorage.getItem('user_saved_villagers')
+      if (saved) {
+        try {
+          setVillagers(JSON.parse(saved))
+        } catch {
+          setVillagers([])
+        }
+      }
+    }
+
+    loadVillagers()
+
+    const handleFocus = () => loadVillagers()
+    const handleStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === 'user_saved_villagers') {
+        loadVillagers()
       }
     }
 
     window.addEventListener('focus', handleFocus)
-    return () => window.removeEventListener('focus', handleFocus)
-  }, [refetch])
+    window.addEventListener('storage', handleStorage as EventListener)
+
+    return () => {
+      window.removeEventListener('focus', handleFocus)
+      window.removeEventListener('storage', handleStorage as EventListener)
+    }
+  }, [])
 
   if (authLoading) {
     return <div style={{ padding: '2rem', textAlign: 'center' }}>Initializing Auth0...</div>
@@ -51,8 +69,6 @@ export function DashboardPage() {
       </div>
     )
   }
-
-  const featuredVillagers = villagers.slice(0, 3)
 
   return (
     <div className="app-container">
@@ -97,14 +113,20 @@ export function DashboardPage() {
         <div className="section-header">
           <h3>My villagers</h3>
           <button onClick={() => navigate('/villagers')} className="see-all-btn">
-            See all {villagers.length} →
+            See all {villagers.filter((v: SavedVillager) => v.category === 'CURRENT').length} →
           </button>
         </div>
 
         <div className="villager-list">
-          {featuredVillagers.map((v: SavedVillager) => (
-            <VillagerCard key={v.id} villager={v} />
-          ))}
+          {villagers
+            .filter((v: SavedVillager) => v.category === 'CURRENT')
+            .map((v: SavedVillager) => (
+              <VillagerCard 
+                key={v.id || v.name} 
+                villager={v} 
+                totalCurrentVillagers={villagers.filter((item: SavedVillager) => item.category === 'CURRENT').length} 
+              />
+            ))}
         </div>
       </section>
 

@@ -3,42 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import { VillagerCategory, SavedVillager } from '../components/models/villager'
 
-const INITIAL_VILLAGERS: SavedVillager[] = [
-  {
-    id: 'muffy',
-    name: 'Muffy',
-    species: 'Sheep',
-    icon: 'https://dodo.ac/np/images/7/73/Muffy_NH_Villager_Icon.png',
-    category: 'CURRENT',
-    friendshipPoints: 200,
-    imageUrl: '',
-    styles: ['Goth', 'Punky'],
-    colors: ['Black', 'Purple'],
-  },
-  {
-    id: 'bruce',
-    name: 'Bruce',
-    species: 'Deer',
-    icon: 'https://dodo.ac/np/images/9/9b/Bruce_NH_Villager_Icon.png',
-    category: 'CURRENT',
-    friendshipPoints: 65,
-    imageUrl: '',
-    styles: ['Simple', 'Active'],
-    colors: ['Blue', 'Black'],
-  },
-  {
-    id: 'teddy',
-    name: 'Teddy',
-    species: 'Bear',
-    icon: 'https://dodo.ac/np/images/b/bd/Teddy_NH_Villager_Icon.png',
-    category: 'CURRENT',
-    friendshipPoints: 25,
-    imageUrl: '',
-    styles: ['Active', 'Simple'],
-    colors: ['Red', 'Blue'],
-  },
-]
-
 interface VillagerSearchResult {
   name: string
   species: string
@@ -63,14 +27,14 @@ export function VillagerListPage() {
   const loadVillagers = () => {
     const saved = localStorage.getItem('user_saved_villagers')
     if (!saved) {
-      setVillagers(INITIAL_VILLAGERS)
-      localStorage.setItem('user_saved_villagers', JSON.stringify(INITIAL_VILLAGERS))
+      setVillagers([])
+      localStorage.setItem('user_saved_villagers', JSON.stringify([]))
       return
     }
     try {
       setVillagers(JSON.parse(saved))
     } catch {
-      setVillagers(INITIAL_VILLAGERS)
+      setVillagers([])
     }
   }
 
@@ -133,7 +97,9 @@ export function VillagerListPage() {
       icon: selectedVillager.nh_details?.icon_url || '',
       category,
       friendshipPoints: category === 'CURRENT' ? 25 : 0,
-      imageUrl: ''
+      imageUrl: '',
+      colors: (selectedVillager as any).nh_details?.fav_colors || ['Pink', 'White'],
+      styles: (selectedVillager as any).nh_details?.fav_styles || ['Cute', 'Active']
     }
 
     const filtered = villagers.filter((v) => v.id !== newVillager.id)
