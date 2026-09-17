@@ -238,7 +238,7 @@ export function VillagerListPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
               <input
                 type="text"
                 placeholder="Search villager name..."
@@ -256,64 +256,60 @@ export function VillagerListPage() {
             </form>
 
             {searchResults.length > 0 && (
-              <div style={{ position: 'relative', marginBottom: '1rem' }}>
-                <div 
-                  style={{ 
-                    position: 'absolute', 
-                    top: 0, 
-                    left: 0, 
-                    right: 0, 
-                    maxHeight: '180px', 
-                    overflowY: 'auto', 
-                    backgroundColor: '#FFF', 
-                    border: '1px solid #E0DAD0', 
-                    borderRadius: '8px', 
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
-                    zIndex: 20, 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    gap: '0.2rem',
-                    padding: '0.3rem'
-                  }}
-                >
-                  {searchResults.map((res) => (
-                    <div
-                      key={res.name}
-                      onClick={() => {
+              <div 
+                style={{ 
+                  maxHeight: '180px', 
+                  overflowY: 'auto', 
+                  backgroundColor: '#FFF', 
+                  border: '1px solid #E0DAD0', 
+                  borderRadius: '8px', 
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+                  marginBottom: '1rem', 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '0.2rem',
+                  padding: '0.3rem'
+                }}
+              >
+                {searchResults.map((res) => (
+                  <div
+                    key={res.name}
+                    onClick={() => {
+                      setSelectedVillager(res)
+                      setSearchResults([])
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
                         setSelectedVillager(res)
                         setSearchResults([])
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          setSelectedVillager(res)
-                          setSearchResults([])
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        padding: '0.4rem 0.6rem',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        backgroundColor: selectedVillager?.name === res.name ? '#EAF3EC' : 'transparent',
-                      }}
-                    >
-                      <img src={res.nh_details?.icon_url} alt={res.name} style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
-                      <div>
-                        <strong style={{ fontSize: '0.85rem', color: '#2D2B2A' }}>{res.name}</strong>
-                        <div style={{ fontSize: '0.7rem', color: '#7A756C' }}>{res.species}</div>
-                      </div>
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      padding: '0.4rem 0.6rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      backgroundColor: selectedVillager?.name === res.name ? '#EAF3EC' : 'transparent',
+                    }}
+                  >
+                    {res.nh_details?.icon_url && (
+                      <img src={res.nh_details.icon_url} alt={res.name} style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
+                    )}
+                    <div>
+                      <strong style={{ fontSize: '0.85rem', color: '#2D2B2A' }}>{res.name}</strong>
+                      <div style={{ fontSize: '0.7rem', color: '#7A756C' }}>{res.species}</div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             )}
 
             {selectedVillager && (
-              <div style={{ borderTop: '1px solid #EEE', paddingTop: '0.75rem', marginTop: searchResults.length > 0 ? '190px' : '0' }}>
+              <div style={{ borderTop: '1px solid #EEE', paddingTop: '0.75rem' }}>
                 <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', fontWeight: 'bold', color: '#2D2B2A' }}>
                   Save {selectedVillager.name} as:
                 </p>
